@@ -7,7 +7,7 @@
         <div class="card app-card">
             <div class="card-body">
                 <h5>{{ $editBook ? 'Edit Buku' : 'Tambah Buku' }}</h5>
-                <form method="POST" action="{{ $editBook ? route('admin.books.update', $editBook) : route('admin.books.store') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ $editBook ? route('admin.books.update', $editBook) : route('admin.books.store') }}">
                     @csrf
                     @if($editBook)
                         @method('PUT')
@@ -39,8 +39,8 @@
                     <div class="mb-2"><label class="form-label">Genre</label><input class="form-control" name="genre" value="{{ old('genre', $editBook->genre ?? '') }}"></div>
                     <div class="mb-2"><label class="form-label">Bahasa</label><input class="form-control" name="language" value="{{ old('language', $editBook->language ?? 'Indonesia') }}"></div>
                     <div class="mb-2">
-                        <label class="form-label">Cover Buku (upload file)</label>
-                        <input class="form-control" type="file" name="cover_image_file" accept="image/*">
+                        <label class="form-label">Cover Buku (URL gambar)</label>
+                        <input class="form-control" type="text" name="cover_image" value="{{ old('cover_image', $editBook->cover_image ?? '') }}" placeholder="/storage/books/covers/your.jpg or https://...">
                         <div class="form-text">Kosongkan jika ingin memakai cover default atau tetap memakai cover lama saat edit.</div>
                     </div>
                     @if($editBook && $editBook->cover_image)
