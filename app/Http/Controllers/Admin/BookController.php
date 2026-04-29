@@ -43,7 +43,10 @@ class BookController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $data = $request->validate([
+        Log::info('BookController::store called', ['hasFile' => $request->hasFile('cover_image_file'), 'files' => array_keys($request->files->all())]);
+
+        try {
+            $data = $request->validate([
             'book_code' => ['nullable', 'string', 'max:50', 'unique:books,book_code'],
             'title' => ['required', 'string', 'max:200'],
             'author' => ['required', 'string', 'max:150'],
@@ -57,6 +60,11 @@ class BookController extends Controller
             'cover_image_file' => ['nullable', 'file', 'image', 'max:4096'],
             'stock' => ['nullable', 'integer', 'min:0'],
         ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::warning('BookController::store validation failed', ['errors' => $e->errors()]);
+            throw $e;
+        }
 
         if (! empty($data['publisher_id'])) {
             $publisher = Publisher::query()->find($data['publisher_id']);
@@ -86,7 +94,10 @@ class BookController extends Controller
 
     public function update(Request $request, Book $book): RedirectResponse
     {
-        $data = $request->validate([
+        Log::info('BookController::update called', ['book_id' => $book->id, 'hasFile' => $request->hasFile('cover_image_file'), 'files' => array_keys($request->files->all())]);
+
+        try {
+            $data = $request->validate([
             'book_code' => ['nullable', 'string', 'max:50', 'unique:books,book_code,' . $book->id],
             'title' => ['required', 'string', 'max:200'],
             'author' => ['required', 'string', 'max:150'],
@@ -100,6 +111,11 @@ class BookController extends Controller
             'cover_image_file' => ['nullable', 'file', 'image', 'max:4096'],
             'stock' => ['nullable', 'integer', 'min:0'],
         ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::warning('BookController::update validation failed', ['errors' => $e->errors()]);
+            throw $e;
+        }
 
         if (! empty($data['publisher_id'])) {
             $publisher = Publisher::query()->find($data['publisher_id']);
