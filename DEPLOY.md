@@ -22,9 +22,15 @@ npm ci
 npm run build
 ```
 
-6. Ensure `public/` is the web root and permissions allow web server to read `storage/` and `bootstrap/cache`.
-7. Configure scheduler/cron for `php artisan schedule:run` if required.
-8. Set up HTTPS and domain (Hostinger panel).
+6. Create the storage symlink:
+
+```powershell
+php artisan storage:link
+```
+
+7. Ensure `public/` is the web root and permissions allow web server to read `storage/` and `bootstrap/cache`.
+8. Configure scheduler/cron for `php artisan schedule:run` if required.
+9. Set up HTTPS and domain (Hostinger panel).
 
 Notes:
 - If Composer is not available, install Composer on the server or use `php composer.phar`.
