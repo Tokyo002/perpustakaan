@@ -6,7 +6,7 @@
     <div class="col-lg-8">
         <div class="card app-card">
             <div class="card-body">
-                <form method="POST" action="{{ route('admin.gallery.update', $item) }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('admin.gallery.update', $item) }}">
                     @csrf
                     @method('PUT')
                     <div class="mb-3">
@@ -23,10 +23,10 @@
                         @error('media_type')<span class="invalid-feedback">{{ $message }}</span>@enderror
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Upload File Media</label>
-                        <input class="form-control @error('media_file') is-invalid @enderror" type="file" name="media_file" accept="image/*,video/*">
-                        <div class="form-text">Kosongkan jika tidak ingin mengganti file.</div>
-                        @error('media_file')<span class="invalid-feedback">{{ $message }}</span>@enderror
+                        <label class="form-label">URL Media</label>
+                        <input class="form-control @error('media_url') is-invalid @enderror" type="text" name="media_url" value="{{ old('media_url', $item->media_url) }}" placeholder="/storage/gallery/image.jpg atau https://...">
+                        <div class="form-text">Kosongkan jika tidak ingin mengganti URL media.</div>
+                        @error('media_url')<span class="invalid-feedback">{{ $message }}</span>@enderror
                     </div>
                     @if($item->media_url)
                         <div class="mb-3">
