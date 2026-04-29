@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Book extends Model
 {
@@ -54,6 +56,33 @@ class Book extends Model
         return Attribute::make(
             get: fn (?string $value) => $value ?: self::DEFAULT_COVER_IMAGE,
             set: fn (?string $value) => blank($value) ? self::DEFAULT_COVER_IMAGE : $value,
+        );
+    }
+
+    protected function coverImageUrl(): Attribute
+    {
+        return Attribute::make(
+            get: function (?string $value, array $attributes): string {
+                $coverImage = $attributes['cover_image'] ?? self::DEFAULT_COVER_IMAGE;
+
+                if (blank($coverImage)) {
+                    return asset(self::DEFAULT_COVER_IMAGE);
+                }
+
+                if (Str::startsWith($coverImage, ['http://', 'https://'])) {
+                    return $coverImage;
+                }
+
+                if (Str::startsWith($coverImage, 'storage/')) {
+                    $relativePath = Str::after($coverImage, 'storage/');
+
+                    if (! Storage::disk('public')->exists($relativePath)) {
+                        return asset(self::DEFAULT_COVER_IMAGE);
+                    }
+                }
+
+                return asset($coverImage);
+            }
         );
     }
 

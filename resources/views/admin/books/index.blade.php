@@ -45,7 +45,7 @@
                     </div>
                     @if($editBook && $editBook->cover_image)
                         <div class="mb-2">
-                            <img src="{{ asset($editBook->cover_image) }}" alt="cover saat ini" width="70" height="90" style="object-fit:cover;border-radius:6px;">
+                            <img src="{{ $editBook->cover_image_url }}" alt="cover saat ini" width="70" height="90" style="object-fit:cover;border-radius:6px;">
                         </div>
                     @endif
                     <div class="mb-2"><label class="form-label">Abstrak</label><textarea class="form-control" name="abstract" rows="3">{{ old('abstract', $editBook->abstract ?? '') }}</textarea></div>
@@ -72,7 +72,7 @@
                         @forelse($books as $item)
                             <tr>
                                 <td>
-                                    <img src="{{ asset($item->cover_image) }}" alt="cover" width="45" height="60" style="object-fit:cover;border-radius:6px;">
+                                    <img src="{{ $item->cover_image_url }}" alt="cover" width="45" height="60" style="object-fit:cover;border-radius:6px;">
                                 </td>
                                 <td>{{ $item->book_code ?? '-' }}</td>
                                 <td>{{ $item->title }}</td>

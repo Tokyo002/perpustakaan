@@ -540,7 +540,7 @@
                 @forelse ($books as $book)
                     <div class="col-md-6 col-lg-4">
                         <article class="book-card">
-                            <img class="cover" src="{{ $book->cover_image ? asset($book->cover_image) : asset('template/img/buku.jpg') }}" alt="Cover {{ $book->title }}">
+                            <img class="cover" src="{{ $book->cover_image_url }}" alt="Cover {{ $book->title }}">
                             <div class="p-3">
                                 <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
                                     <h3 class="h5 mb-0">{{ $book->title }}</h3>
