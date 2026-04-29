@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class BookController extends Controller
@@ -138,9 +139,29 @@ class BookController extends Controller
     private function storeBookCover($file): string
     {
         $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('books/covers', $filename, 'public');
 
-        return 'storage/' . $path;
+        try {
+            $path = $file->storeAs('books/covers', $filename, 'public');
+            Log::info('storeBookCover: attempted storeAs', ['path' => $path, 'filename' => $filename]);
+
+            if ($path && Storage::disk('public')->exists($path)) {
+                return 'storage/' . $path;
+            }
+
+            // Fallback: try putFileAs directly on the disk
+            $fallback = Storage::disk('public')->putFileAs('books/covers', $file, $filename);
+            Log::info('storeBookCover: fallback putFileAs result', ['result' => $fallback]);
+
+            if ($fallback) {
+                return 'storage/' . ltrim($fallback, '/');
+            }
+
+            Log::warning('storeBookCover: failed to store file, returning default cover', ['filename' => $filename]);
+            return Book::DEFAULT_COVER_IMAGE;
+        } catch (\Throwable $e) {
+            Log::error('storeBookCover error', ['message' => $e->getMessage()]);
+            return Book::DEFAULT_COVER_IMAGE;
+        }
     }
 
     private function deleteStoredFile(?string $path): void
