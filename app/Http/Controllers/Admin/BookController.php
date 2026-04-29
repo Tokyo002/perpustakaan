@@ -9,6 +9,8 @@ use App\Models\Category;
 use App\Models\Publisher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class BookController extends Controller
@@ -51,7 +53,7 @@ class BookController extends Controller
             'language' => ['nullable', 'string', 'max:50'],
             'genre' => ['nullable', 'string', 'max:120'],
             'abstract' => ['nullable', 'string', 'max:5000'],
-            'cover_image' => ['nullable', 'string', 'max:255'],
+            'cover_image_file' => ['nullable', 'file', 'image', 'max:4096'],
             'stock' => ['nullable', 'integer', 'min:0'],
         ]);
 
@@ -63,7 +65,14 @@ class BookController extends Controller
         $data['language'] = $data['language'] ?? 'Indonesia';
         $data['stock'] = $data['stock'] ?? 0;
         $data['is_available'] = ($data['stock'] ?? 0) > 0;
-        $data['cover_image'] = $data['cover_image'] ?? Book::DEFAULT_COVER_IMAGE;
+
+        if ($request->hasFile('cover_image_file')) {
+            $data['cover_image'] = $this->storeBookCover($request->file('cover_image_file'));
+        } else {
+            $data['cover_image'] = Book::DEFAULT_COVER_IMAGE;
+        }
+
+        unset($data['cover_image_file']);
 
         if (empty($data['book_code'])) {
             $data['book_code'] = $this->generateBookCode();
@@ -87,7 +96,7 @@ class BookController extends Controller
             'language' => ['nullable', 'string', 'max:50'],
             'genre' => ['nullable', 'string', 'max:120'],
             'abstract' => ['nullable', 'string', 'max:5000'],
-            'cover_image' => ['nullable', 'string', 'max:255'],
+            'cover_image_file' => ['nullable', 'file', 'image', 'max:4096'],
             'stock' => ['nullable', 'integer', 'min:0'],
         ]);
 
@@ -99,7 +108,15 @@ class BookController extends Controller
         $data['language'] = $data['language'] ?? 'Indonesia';
         $data['stock'] = $data['stock'] ?? 0;
         $data['is_available'] = ($data['stock'] ?? 0) > 0;
-        $data['cover_image'] = $data['cover_image'] ?? Book::DEFAULT_COVER_IMAGE;
+
+        if ($request->hasFile('cover_image_file')) {
+            $this->deleteStoredFile($book->cover_image);
+            $data['cover_image'] = $this->storeBookCover($request->file('cover_image_file'));
+        } else {
+            $data['cover_image'] = $book->cover_image ?: Book::DEFAULT_COVER_IMAGE;
+        }
+
+        unset($data['cover_image_file']);
 
         if (empty($data['book_code'])) {
             $data['book_code'] = $book->book_code ?: $this->generateBookCode();
@@ -112,9 +129,31 @@ class BookController extends Controller
 
     public function destroy(Book $book): RedirectResponse
     {
+        $this->deleteStoredFile($book->cover_image);
         $book->delete();
 
         return redirect()->route('admin.books.index')->with('success', 'Buku berhasil dihapus.');
+    }
+
+    private function storeBookCover($file): string
+    {
+        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('books/covers', $filename, 'public');
+
+        return 'storage/' . $path;
+    }
+
+    private function deleteStoredFile(?string $path): void
+    {
+        if (blank($path) || $path === Book::DEFAULT_COVER_IMAGE || ! str_starts_with($path, 'storage/')) {
+            return;
+        }
+
+        $relativePath = Str::after($path, 'storage/');
+
+        if (Storage::disk('public')->exists($relativePath)) {
+            Storage::disk('public')->delete($relativePath);
+        }
     }
 
     private function generateBookCode(): string

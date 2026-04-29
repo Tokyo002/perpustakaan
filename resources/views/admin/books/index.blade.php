@@ -7,7 +7,7 @@
         <div class="card app-card">
             <div class="card-body">
                 <h5>{{ $editBook ? 'Edit Buku' : 'Tambah Buku' }}</h5>
-                <form method="POST" action="{{ $editBook ? route('admin.books.update', $editBook) : route('admin.books.store') }}">
+                <form method="POST" action="{{ $editBook ? route('admin.books.update', $editBook) : route('admin.books.store') }}" enctype="multipart/form-data">
                     @csrf
                     @if($editBook)
                         @method('PUT')
@@ -38,7 +38,16 @@
                     <div class="mb-2"><label class="form-label">ISBN</label><input class="form-control" name="isbn" value="{{ old('isbn', $editBook->isbn ?? '') }}"></div>
                     <div class="mb-2"><label class="form-label">Genre</label><input class="form-control" name="genre" value="{{ old('genre', $editBook->genre ?? '') }}"></div>
                     <div class="mb-2"><label class="form-label">Bahasa</label><input class="form-control" name="language" value="{{ old('language', $editBook->language ?? 'Indonesia') }}"></div>
-                    <div class="mb-2"><label class="form-label">Cover Buku (path/url, kosong = default)</label><input class="form-control" name="cover_image" value="{{ old('cover_image', $editBook->cover_image ?? '') }}"></div>
+                    <div class="mb-2">
+                        <label class="form-label">Cover Buku (upload file)</label>
+                        <input class="form-control" type="file" name="cover_image_file" accept="image/*">
+                        <div class="form-text">Kosongkan jika ingin memakai cover default atau tetap memakai cover lama saat edit.</div>
+                    </div>
+                    @if($editBook && $editBook->cover_image)
+                        <div class="mb-2">
+                            <img src="{{ asset($editBook->cover_image) }}" alt="cover saat ini" width="70" height="90" style="object-fit:cover;border-radius:6px;">
+                        </div>
+                    @endif
                     <div class="mb-2"><label class="form-label">Abstrak</label><textarea class="form-control" name="abstract" rows="3">{{ old('abstract', $editBook->abstract ?? '') }}</textarea></div>
                     <button class="btn btn-primary" type="submit">Simpan</button>
                     @if($editBook)

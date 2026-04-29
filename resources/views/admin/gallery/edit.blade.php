@@ -6,7 +6,7 @@
     <div class="col-lg-8">
         <div class="card app-card">
             <div class="card-body">
-                <form method="POST" action="{{ route('admin.gallery.update', $item) }}">
+                <form method="POST" action="{{ route('admin.gallery.update', $item) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="mb-3">
@@ -22,13 +22,24 @@
                         </select>
                         @error('media_type')<span class="invalid-feedback">{{ $message }}</span>@enderror
                     </div>
-<div class="mb-3">
-    <label class="form-label">Upload Gambar Media</label>
-    <input type="file" accept="image/*" class="form-control @error('media_url') is-invalid @enderror" name="media_url" required>
-    @error('media_url')
-        <span class="invalid-feedback">{{ $message }}</span>
-    @enderror
-</div>
+                    <div class="mb-3">
+                        <label class="form-label">Upload File Media</label>
+                        <input class="form-control @error('media_file') is-invalid @enderror" type="file" name="media_file" accept="image/*,video/*">
+                        <div class="form-text">Kosongkan jika tidak ingin mengganti file.</div>
+                        @error('media_file')<span class="invalid-feedback">{{ $message }}</span>@enderror
+                    </div>
+                    @if($item->media_url)
+                        <div class="mb-3">
+                            <label class="form-label d-block">File saat ini</label>
+                            @if($item->media_type === 'video')
+                                <video controls style="max-width: 100%; height: auto; border-radius: 8px;">
+                                    <source src="{{ asset($item->media_url) }}">
+                                </video>
+                            @else
+                                <img src="{{ asset($item->media_url) }}" alt="{{ $item->title }}" class="img-fluid rounded" style="max-height: 220px; object-fit: cover;">
+                            @endif
+                        </div>
+                    @endif
                     <div class="mb-3">
                         <label class="form-label">Caption (Opsional)</label>
                         <textarea class="form-control @error('caption') is-invalid @enderror" name="caption" rows="3">{{ old('caption', $item->caption) }}</textarea>

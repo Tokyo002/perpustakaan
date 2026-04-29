@@ -6,7 +6,7 @@
     <div class="col-lg-8">
         <div class="card app-card">
             <div class="card-body">
-                <form method="POST" action="{{ route('admin.gallery.store') }}">
+                <form method="POST" action="{{ route('admin.gallery.store') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3">
                         <label class="form-label">Judul</label>
@@ -22,9 +22,10 @@
                         @error('media_type')<span class="invalid-feedback">{{ $message }}</span>@enderror
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">URL / Path Media</label>
-                        <input class="form-control @error('media_url') is-invalid @enderror" name="media_url" value="{{ old('media_url') }}" required>
-                        @error('media_url')<span class="invalid-feedback">{{ $message }}</span>@enderror
+                        <label class="form-label">Upload File Media</label>
+                        <input class="form-control @error('media_file') is-invalid @enderror" type="file" name="media_file" accept="image/*,video/*" required>
+                        <div class="form-text">Bisa gambar atau video.</div>
+                        @error('media_file')<span class="invalid-feedback">{{ $message }}</span>@enderror
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Caption (Opsional)</label>

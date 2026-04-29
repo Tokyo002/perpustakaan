@@ -4,7 +4,7 @@
 <h2 class="mb-3">Modul Pengaturan</h2>
 <div class="card app-card">
     <div class="card-body">
-        <form method="POST" action="{{ route('admin.settings.update') }}">
+        <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data">
             @csrf
             <div class="row g-3">
                 <div class="col-md-6">
@@ -12,8 +12,14 @@
                     <input class="form-control" name="system_name" value="{{ old('system_name', $setting->system_name) }}" required>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Logo (path/url)</label>
-                    <input class="form-control" name="system_logo" value="{{ old('system_logo', $setting->system_logo) }}">
+                    <label class="form-label">Logo Sistem (upload file)</label>
+                    <input type="file" class="form-control" name="system_logo_file" accept="image/*">
+                    <div class="form-text">Kosongkan jika tidak ingin mengganti logo.</div>
+                    @if($setting->system_logo)
+                        <div class="mt-2">
+                            <img src="{{ asset($setting->system_logo) }}" alt="Logo saat ini" style="max-height: 80px; width: auto;">
+                        </div>
+                    @endif
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Telepon</label>
