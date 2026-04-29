@@ -66,7 +66,7 @@ class Book extends Model
                 $coverImage = $attributes['cover_image'] ?? self::DEFAULT_COVER_IMAGE;
 
                 if (blank($coverImage)) {
-                    return '/' . ltrim(self::DEFAULT_COVER_IMAGE, '/');
+                    return asset(self::DEFAULT_COVER_IMAGE);
                 }
 
                 if (Str::startsWith($coverImage, ['http://', 'https://'])) {
@@ -77,13 +77,13 @@ class Book extends Model
                     $relativePath = Str::after($coverImage, 'storage/');
 
                     if (! Storage::disk('public')->exists($relativePath)) {
-                        return '/' . ltrim(self::DEFAULT_COVER_IMAGE, '/');
+                        return asset(self::DEFAULT_COVER_IMAGE);
                     }
 
-                    return '/' . ltrim($coverImage, '/');
+                    return asset('storage/' . ltrim($relativePath, '/'));
                 }
 
-                return '/' . ltrim($coverImage, '/');
+                return asset(ltrim($coverImage, '/'));
             }
         );
     }
